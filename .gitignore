@@ -1,0 +1,10 @@
+# TODO: Finish these
+content/pins/
+content/docs/
+template/pins/
+template/docs
+static/images/pins
+
+public/
+node_modules/
+.DS_Store

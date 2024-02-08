@@ -1,0 +1,38 @@
+{% extends "page.html" %}
+{% import 'macros/utils.html' as utils -%}
+{% import 'macros/posts.html' as posts -%}
+
+{% block content %}
+  {% if content %}
+  <main class="py-12 px-24 lg:px-32 container max-w-screen-md lg:pt-20 pb-6 mx-auto format dark:format-invert">
+    {{ section.content | safe }}
+  </main>
+  {% endif %}
+
+  <aside class="flex flex-col max-w-screen-md mx-auto mt-16">
+    <h1 class="text-5xl font-black mb-4 px-4">Blog posts</h1>
+
+    <ul class="flex flex-col gap-y-10">
+      {% set blog_posts = get_section(path="blog/_index.md") %}
+      {% for post in blog_posts.pages %}
+        {% set post_kind = post.extra.kind | default(value="blog") %}
+
+        <li>
+        {{ 
+          posts::summary(
+            title=post.title,
+            image=post.extra.image.src,
+            alt=post.extra.image.alt,
+            description=post.description,
+            date=post.date,
+            link=post.permalink,
+            kind=post_kind,
+            tags=post.taxonomies.tags,
+          )
+        }}
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+{% endblock content %}

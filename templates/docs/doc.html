@@ -1,0 +1,37 @@
+{% extends "page.html" %}
+
+{% macro docs_nav() %}
+    {% set blog_posts = get_section(path="blog/_index.md") %}
+    <h5 class="text-3xl font-bold mb-2">Browse</h5>
+    <ul class="text-sm">
+      {% for post in blog_posts.pages %}
+        {% set post_kind = post.extra.kind | default(value="blog") %}
+        <li class="block rounded hover:bg-gray-100 p-2 bg-gray-50">
+          <a href="{{ post.permalink }}" class="block">
+            {{ post.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% block additional_nav %}
+  {{ self::docs_nav() }}
+{% endblock additional_nav %}
+
+{% block content %}
+  {% set doc = page | default(value=section) %}
+  <div class="flex flex-1 items-stretch">
+    <div class="flex-col w-80 hidden md:flex p-4">
+      {{ self::docs_nav() }}
+    </div>
+
+    <div class="container format pt-16 pb-16">
+      <h1>
+        {{ doc.title | safe }}
+      </h1>
+
+      {{ doc.content | markdown | safe }}
+    </div>
+  </div>
+{% endblock content %}

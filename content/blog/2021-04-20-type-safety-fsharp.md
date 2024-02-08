@@ -1,0 +1,239 @@
++++
+title = "Improved type-safety patterns in F#"
+description = "Leveraging F#'s type system to provide extra type-safety & context"
+
+[taxonomies]
+tags = ["fsharp"]
+
+[extra.image]
+src = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/F_Sharp_logo.svg/1200px-F_Sharp_logo.svg.png"
+alt = "FSharp logo"
+
+[[extra.links]]
+name = "Units of Measure"
+url = "https://learn.microsoft.com/en-us/dotnet/fsharp/language-reference/units-of-measure"
+
+[[extra.links]]
+name = "FSharp.UMX"
+url = "https://github.com/fsprojects/FSharp.UMX"
++++
+
+I enjoy using statically-typed languages for obvious benefit of compile-time
+safety, but an overlooked feature is the added context that rich types can provide.
+
+For this reason, I try to minimise [primitive obsession](https://refactoring.guru/smells/primitive-obsession)
+by creating distinct types wherever possible, often leveraging the 'newtype' idiom 
+to wrap a primitive type (eg. string or int) in a record or single-case discriminated 
+union.
+
+As with all things in tech, there are trade-offs to consider here. While it provides a
+a higher level type-signature clarity, type-safety and convenience (via. instance members), 
+there is a performance penalty due to the extra allocations, and a developer experience
+penality due to the need for wrapping, unwrapping and converting between these types.
+
+Luckily, there are a couple of tricks that can improve the experience with
+minimal downside - [Units of measure](#units-of-measure) & [phantom types](#phantom-types)
+
+## Units of measure
+
+### What is a unit of measure?
+
+If you're not fimilar with [units of measure (UoM)](https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/units-of-measure),
+this is a language feature that allows us to refine a numeric type to a specific measurement.
+
+This refinement is erased at compile-time - eliminting runtime overhead of the 
+newtype pattern - and provides increased type-safety as it further refines the type 
+signature.
+
+A naive implementation of a speed-calculating function might look like this:
+
+```fs
+// calculateSpeed: int -> int -> int
+let calculateSpeed (distance: int) (duration: int) = distance/duration
+```
+
+But the type-signature opaque at a glance, and the implementation does not 
+restrict us from supplying the wrong value to each argument.
+
+On the other hand, if we use units of measure...
+
+```fs
+type [<Measure>] km
+type [<Measure>] seconds
+
+// calculateSpeed: int<km> -> int<seconds> -> int<km/seconds>
+let calculateSpeed (distance: int<km>) (duration: int<seconds>) =
+  distance/duration
+
+let distance = 100<km>
+let duration = 10<seconds>
+
+calculateSpeed distance duration
+// Returns : int<km/seconds> = 10
+```
+
+### Beyond numerical measurements
+
+This is all good and well for numerical domains, but it's application (at least
+for my usage) is very limited.
+
+Luckily, [FSharp.UMX](https://github.com/fsprojects/FSharp.UMX) extends this feature
+with the ability to apply units of measure to other primitive types.
+
+The main stand-out for me is the ability to apply UoMs to strings, as this provides
+a way of creating custom types without the overhead previously mentioned.
+
+Consider the following example:
+
+```fs
+let emailAddress = "james@absolutejam.co.uk"
+let subject = "Hey!"
+let body = "How are you?"
+
+// sendEmail: string -> string -> string -> unit
+let sendEmail subject body email = // implementation
+
+sendEmail email body subject // oops, wrong order!
+```
+
+The above version allows using a value as the wrong parameter since all of the
+parameters are `string`.
+
+However, using `FSharp.UMX`, we can limit the types with units of measure.
+
+```fs
+open FSharp.UMX
+
+type [<Measure>] emailAddress
+type EmailAddress = string<emailAddress>
+// ^- Optional type alis to male the type signatures more terse
+
+type [<Measure>] body
+type Body = string<body>
+
+type [<Measure>] subject
+type Subject = string<subject>
+
+// sendEmail: Email -> Subject -> Body -> unit
+let sendEmail (email: Email) (subject: Subject) (emailBody: Body) = // do stuff
+
+// Use the UMX.tag static member or % postfix operator to wrap or unwrap a primitive
+let emailAddress: Email = UMX.tag "james@absolutejam.co.uk"
+let subject: Subject = %"Hey!"
+let body: Body = %"How are you?"
+
+sendEmail subject body email // ok!
+
+sendEmail body email subject // won't compile!
+```
+
+As you can see, we're refining the type for the compiler, but the underlying
+representation is still a vanilla `string`.
+
+{% note() %}
+
+It's worth noting that there is a trade-off when using a UoM vs. a distinct
+type (record or discriminated union), but the choice depends on your requirements
+and your domain.
+
+For example, you can't limit the construction of UoMs, nor can you add
+members to specific measures (as the type is essentially still a `string`).
+{% end %}
+
+
+## Phantom types
+
+Another interesting use of F#'s generics system is the 'phantom types' pattern.
+
+This is when you define a generic type (eg. `Foo<'t>`), but never actually use
+the type parameter. Instead, this type parameter is only provided as a means of 
+further refining the type.
+
+For example, in the event we need to move some files between between different
+devices, we may interact with different filesystems - a local filesystem and a
+remote filesystem over SSH.
+
+The obvious approach would be to define a new type:
+
+```fs
+type FilePath = FilePath of string
+// Single-case discriminated union that wraps a string representing a file path
+```
+
+However, this type doesn't provide any information about the underlying filesystem -
+Is this a path on my local machine or the remote machine?
+
+This could lead to run-time issues if we're not careful how we use each instance of
+this type. For example, we would be fully able to construct a `System.IO.FileInfo` 
+from a `FilePath` even if we were referring to a remote filesystem.
+
+The program would compile, the instance would be constructed and... the file wouldn't
+exist, leading us to getting bogus metadata from this object. While this is something
+we can solve with runtime checks, it would be great if we could encode more of this
+in formation directly in the type.
+
+To fix this, we can refactor the `FilePath` to require a type parameter.
+
+```fs
+type IFileSystem = interface end           // marker interface
+type SftpFileSystem = inherit IFileSystem
+type LocalFileSystem = inherit IFileSystem
+
+type FilePath<'filesystem when 'filesystem :> IFileSystem> = FilePath of string
+
+let sftpPath: FilePath<SftpFileSytem> = FileSystem<_> "foo"
+let localPath: FilePath<LocalFileSytem> = FileSystem<_> "bar"
+```
+
+In the above example, we've given the `FilePath` a new type parameter that
+identifies the kind of filesystem for the path.
+
+As well as this, we've restricted this type parameter to only allow types that
+implement the `IFileSystem` interface, and declared two distinct file system types,
+`SftpFileSystem` and `LocalFileSystem`.
+
+If we then try to pass a `FilePath<LocalFileSystem>` to a function that wants
+a `FilePath<SftpFileSystem>`, we will be presented with a clear type error.
+We can still coerce one type into the other - since they contain the same 
+underlying data - but this is an explicit act, and we can even secure this
+with some runtime checks.
+
+{% note() %}
+
+The `IFileSystem` interface - and those inheriting it, such as `SftpFileSystem`
+& `LocalFileSystem` - are 'marker interfaces' as they provide no additional
+members, and are only used as a way of 'tagging' types.
+
+{% end %}
+
+Now, we can see that type definitions are much more clear:
+
+```fs
+// From
+FilePath -> FilePath
+
+// To
+FilePath<LocalFileSystem> -> FilePath<SftpFileSystem>
+```
+
+And we can 
+
+And here are some example implementations leveraging our new and improved type:
+
+```fs
+// An interface that moves files from one filesystem type to another
+type IDataMover<'inFs, 'outFs when 'inFs :> IFileSystem and 'outFs :> IFileSystem> =
+    abstract member Move: 
+        source: FilePath<'inFs> * dest: FilePath<'outFs> -> Async<Result<unit, exn>>
+
+// An implementation that moves local files to a remote machine via. SSH
+type LocalToRemoteMover (sshConfig: SshConfig) =
+    interface IDataMover<LocalFileSystem, SftpFileSystem> with
+        member _.Move(source, dest) =
+            // logic goes here
+
+// A generic file validator function that can be easily combined
+type IFileValidator<'fs when 'fs :> IFileSystem> =
+    abstract Validate: FilePath<'filesystem> -> Async<Result<FilePath<'fs>, exn>>
+```
+

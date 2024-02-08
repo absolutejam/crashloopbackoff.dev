@@ -1,0 +1,55 @@
+{% macro summary(
+  title,
+  image,
+  alt,
+  description,
+  date,
+  link,
+  kind,
+  tags
+) %}
+  <article class="flex flex-col lg:flex-row items-center gap-y-4 gap-x-4 p-6 bg-background rounded-lg">
+    {% if image %}
+      <img src="{{ image }}" alt="{{ alt | default(value='') }}" class="h-40 w-40" />
+    {% endif %}
+
+    <div class="flex flex-col">
+      <div class="flex justify-between items-center mb-2 text-gray-500">
+      <!--
+        <span class="
+            bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-500 
+            text-base font-light inline-flex items-center tracking-wide
+            py-1 rounded gap-x-1
+          ">
+          <i data-lucide="{{ utils::blog_icon(kind=kind) }}" class="text h-5 w-5"></i>
+          {{ kind }}
+        </span>
+      -->
+        <span class="text-sm" data-format-date="{{ date }}"></span>
+      </div>
+
+      <h2 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <a href="{{ link }}">{{ title }}</a>
+      </h2>
+
+      {% if description %}
+      <p class="format dark:format-invert font-light mb-4">
+        {{ description | safe }}
+      </p>
+      {% endif %}
+
+      <div class="flex justify-between items-center">
+        <div class="flex flex-row flex-wrap gap-x-1 gap-y-1">
+          {% for tag in tags %}
+            <a 
+              href="/tags/{{ tag }}" 
+              class="inline-flex items-center px-2 py-1 me-2 text-sm font-medium text-primary-800 bg-primary-100 rounded dark:bg-primary-900 dark:text-primary-300"
+            >
+              {{ tag }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </article> 
+{% endmacro %}

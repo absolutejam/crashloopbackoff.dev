@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    color: var(--foreground);
+    background: var(--background);
+  }
+  
+  .navbar-sticky {
+    @apply border-b backdrop-blur-sm shadow-sm;
+  }
+
+  :root {
+    --foreground: #000;
+    --background: #fafafa;
+    --background-alt: var(--tw-gray-50);
+    --border: var(--tw-gray-200);
+    --forminput-bg: var(--tw-gray-50);
+    --forminput-border: var(--tw-gray-300);
+
+    --format-body: var(--tw-gray-800);
+    --format-header: var(--tw-gray-900);
+  }
+
+  :root[class~="dark"] {
+    --foreground: #fff;
+    --background: #000;
+    --background-alt: var(--tw-gray-950);
+    --border: var(--tw-gray-900);
+    --forminput-bg: var(--tw-gray-950);
+    --forminput-border: var(--tw-gray-800);
+
+    --format-body: var(--tw-gray-200);
+    --format-header: var(--tw-gray-100);
+  }
+}
+
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

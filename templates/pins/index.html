@@ -1,0 +1,13 @@
+{% extends "page.html" %}
+
+    {% for pin in data.pins %}
+      {{ pin.name }}
+    {% endfor %}
+
+{% block content %}
+{% set data = load_data(path="content/pins/pins.yaml") -%}
+{% set favourites = data.pins | filter(attribute="favourite", value=true) %}
+  <main class="py-12 px-24 lg:px-32 container max-w-screen-md lg:py-20 mx-auto format dark:format-invert">
+    {{ favourites | json_encode | safe }}
+  </main>
+{% endblock content %}

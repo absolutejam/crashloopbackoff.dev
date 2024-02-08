@@ -1,0 +1,35 @@
+version: "3"
+
+output: prefixed
+
+tasks:
+  default:
+    cmd: task --list
+
+  serve:
+    desc: Runs Zola & TailwindCSS
+    deps:
+      - serve:zola
+      - serve:tailwind
+
+  serve:zola:
+    desc: Runs Zola
+    cmd: zola serve
+
+  serve:tailwind:
+    desc: Runs tailwind CSS builder process
+    cmd: npx tailwindcss -i styles/styles.css -o static/styles/styles.css --watch
+
+  check:
+    desc: Runs checks & linters
+    cmds:
+      - npx eslint content/**
+      - zola check
+
+  build:
+    desc: Builds production app
+    env:
+      NODE_ENV: production
+    cmds:
+      - npx tailwindcss -i styles/styles.css -o static/styles/styles.css
+      - zola build
