@@ -49,22 +49,22 @@
     </button>
   </li>
 </ul>
-{% endmacro %} {% macro site_header() %}
+{% endmacro %} 
+
+{% macro site_header() %}
 <div
-  class="flex flex-col max-w-screen-xl mx-auto pt-8 pb-1 md:flex-nowrap items-center justify-between"
+  class="flex flex-col md:flex-nowrap items-center justify-between"
 >
   <div class="flex justify-center gap-x-2 w-full px-3">
     <div class="flex flex-row items-center mx-auto py-2 gap-x-2">
-      <div
-        class="flex w-14 h-14 items-end justify-start pl-1 pb-1 bg-foreground rounded text-background"
-      >
+      <div class="flex w-14 h-14 items-end justify-start pl-1 pb-1 bg-foreground rounded text-background">
         <i data-lucide="terminal" class="animate-pulse"></i>
       </div>
 
       <div class="flex flex-col">
         <a href="/">
           <span
-            class="self-center text-xl lg:text-2xl font-black whitespace-nowrap dark:text-white"
+            class="self-center font-mono text-xl lg:text-2xl font-black whitespace-nowrap dark:text-white"
           >
             {{ config.title }}
           </span>

@@ -134,7 +134,7 @@ data:
 A basic policy for this could look like:
 
 ```rego
-package secrets.example_1
+package secrets.example
 
 import rego.v1
 
@@ -145,12 +145,9 @@ deny contains reason if {
 }
 ```
 
-This policy lives in the namespace `secrets.example_1` and contains a single rule, 
+This policy lives in the namespace `secrets.example` and contains a single rule, 
 which is comprised of a rule head - `deny contains reason if` - and the body, 
 which contains expressions to evalute. 
-
-The syntax `deny contains reason if { ... }`, is instructing the policy engine to 
-'append the value `reason` to the array `deny` if the expression body is true'.
 
 The expressions in the rule body are implicitly combined with a logical `and`, 
 meaning that if all of the expressions are truthy, the entire rule passes, and 
@@ -166,14 +163,14 @@ then we get a failure reported in Conftest.
 Now, if we run this with:
 
 ```bash
-conftest test --namespace secrets.example_1 resources/secret.yaml
+conftest test resources/secret.yaml
 ```
 
 We should see the following output, with the message being denoted by the
 rule's `reason` variable:
 
 ```
-FAIL - - secrets.example_1 - token-b is required
+FAIL - - secrets.example - token-b is required
 ```
 
 This is because the provided `Secret` does not have a `token-b` data entry
@@ -202,7 +199,7 @@ optionally suffix these terms with an underscored identifier.
   - `warn` - Prints a warning instead of a failure in the console output
 
 ```rego
-package secrets.example_2
+package secrets.example
 
 token_name := "token-b"
 
@@ -274,7 +271,7 @@ for each item. While this can take some getting used to, it's also incredibly
 powerful.
 
 ```rego
-package secrets.example_3
+package secrets.example
 
 import rego.v1
 
@@ -291,9 +288,9 @@ violation contains reason if {
 ```
 
 ```bash
-conftest test --namespace secrets.example_3 ./resources/secret.yaml
-FAIL - ./resources/secret.yaml - secrets.example_3 - No private keys - found 'private-key-1'
-FAIL - ./resources/secret.yaml - secrets.example_3 - No private keys - found 'private-key-2'
+conftest test --namespace secrets.example ./resources/secret.yaml
+FAIL - ./resources/secret.yaml - secrets.example - No private keys - found 'private-key-1'
+FAIL - ./resources/secret.yaml - secrets.example - No private keys - found 'private-key-2'
 ````
 
 ### Comprehensions
@@ -312,7 +309,7 @@ The body inside the comprehension can also contain additional expressions,
 allowing us to filter or transform elements:
 
 ```rego
-package secrets.example_5
+package secrets.example
 
 pkey_header := "-----BEGIN PRIVATE KEY"
 
@@ -337,7 +334,7 @@ violation contains reason if {
 ```
 
 ```bash
-conftest test --namespace secrets.example_5 ./resources/secret.yaml -o json
+conftest test ./resources/secret.yaml -o json
 [
   {
     "filename": "./resources/secret.yaml",
@@ -498,6 +495,7 @@ explains how to model 'or' logic, by definining the same helper rule/function mu
 times.
 
 ```rego
+package secrets.example
 # (A contrived example)
 
 has_token if input.data["token-a"]
@@ -520,7 +518,7 @@ violation contains reason if {
 ```
 
 ```
-FAIL - ./resources/secret.yaml - secrets.example_1 - Secret contains a token
+FAIL - ./resources/secret.yaml - secrets.example - Secret contains a token
 ```
 
 #### Partial rules
@@ -551,6 +549,7 @@ However, we can also define 'partial rules' which are allowed to return multiple
 values as a set:
 
 ```rego
+package secrets.example
 # (Another contrived example)
 
 has_token contains value if {
@@ -575,10 +574,10 @@ violation contains reason if {
 ```
 
 ```
-FAIL - ./resources/secret.yaml - secrets.example_1 - Secret contains tokens: {"dG9rZW4tYQ==", "dG9rZW4tYw=="}
+FAIL - ./resources/secret.yaml - secrets.example - Secret contains tokens: {"dG9rZW4tYQ==", "dG9rZW4tYw=="}
 ```
 
-This looks familiar to the `deny` rules we've writing!
+These helers should look very familiar to the Conftest rules we've writing!
 
 #### Sharing rules & functions
 
@@ -619,6 +618,8 @@ bad_keys:
 This is then merged into the `data` object.
 
 ```rego
+package secrets.example
+
 violation contains reason if {
   input.kind == "Secret"
   some key, _ in input.data
@@ -629,12 +630,12 @@ violation contains reason if {
 ```
 
 ```bash
-conftest test --namespace secrets.example_1 --data data/data.yaml ./resources/secret.yaml 
+conftest test --data data/data.yaml ./resources/secret.yaml 
 ```
 
 ```
-FAIL - ./resources/secret.yaml - secrets.example_1 - Bad key detected: token-a
-FAIL - ./resources/secret.yaml - secrets.example_1 - Bad key detected: token-c
+FAIL - ./resources/secret.yaml - secrets.example - Bad key detected: token-a
+FAIL - ./resources/secret.yaml - secrets.example - Bad key detected: token-c
 ```
 
 {% note() %}
@@ -734,7 +735,7 @@ spec:
 With the following policy:
 
 ```rego
-package secrets.example_1
+package secrets.example
 
 import rego.v1
 
@@ -803,10 +804,10 @@ conftest test ./resources/pod.yaml ./resources.secret.yaml
 ```
 
 ```
-FAIL - Combined - secrets.example_1 - volume 'tokenz' is not mounted by container 'nginx'
-FAIL - Combined - secrets.example_1 - secret 'tokens' has no associated volume in Pod spec
-FAIL - Combined - secrets.example_1 - secret datum 'password' not explicitly mapped in to Pod volume
-FAIL - Combined - secrets.example_1 - volume is attempting to map invalid data key 'token-b'
+FAIL - Combined - secrets.example - volume 'tokenz' is not mounted by container 'nginx'
+FAIL - Combined - secrets.example - secret 'tokens' has no associated volume in Pod spec
+FAIL - Combined - secrets.example - secret datum 'password' not explicitly mapped in to Pod volume
+FAIL - Combined - secrets.example - volume is attempting to map invalid data key 'token-b'
 ```
 
 ## Conclusion

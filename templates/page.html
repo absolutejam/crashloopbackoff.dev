@@ -35,17 +35,18 @@
       {% endblock additional_nav %}
     </div>
 
-    {{ layout::site_header() }}
+    <div class="flex flex-row justify-between py-6 px-10 items-center">
+      {{ layout::site_header() }}
 
-    <!-- Navbar -->
-    <nav
-      id="sticky-navbar"
-      class="
-        hidden items-center justify-between w-full py-3 border-border bg-[#fafafa] dark:bg-black bg-opacity-90 dark:bg-opacity-80
-        md:flex md:sticky z-30 md:w-auto md:items-center md:justify-center md:gap-x-2 md:pr-6 md:top-0
-      ">
-      {{ layout::nav_links() }}
-    </nav>
+      <!-- Navbar -->
+      <nav
+        class="
+          hidden items-center justify-between w-full py-3 border-border bg-[#fafafa] dark:bg-gray-950 bg-opacity-90 dark:bg-opacity-80
+          md:flex z-30 md:w-auto md:items-center md:justify-end md:gap-x-2 md:pr-6 md:top-0
+        ">
+        {{ layout::nav_links() }}
+      </nav>
+    </div>
 
     {% block content %}
     {% endblock content %}

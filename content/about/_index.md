@@ -1,7 +1,7 @@
 +++
 title = "About"
 template = "blog/post.html"
-extra.toc = false
+extra.toc = true
 +++
 
 ## Me

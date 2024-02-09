@@ -2,7 +2,7 @@
 
 {% block content %}
   <main class="py-12 px-24 lg:px-32 container max-w-screen-md lg:py-20 mx-auto format dark:format-invert">
-    <h1 class="hover:text-primary-600">{{ taxonomy.name }}</h1>
+    <h1 class="hover:text-primary-600 dark:hover:text-primary-400">{{ taxonomy.name }}</h1>
     <p>
       {% for term in terms %}
         <a href="{{ term.permalink | safe }}">#{{ term.name }}</a>[{{ term.pages | length }}]

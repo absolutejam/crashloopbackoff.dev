@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% import 'macros/utils.html' as utils -%}
+{% import 'macros/posts.html' as posts -%}
+
+{% block content %}
+  <main class="py-12 px-20 container max-w-screen-md lg:py-20 mx-auto format">
+    {{ section.content | safe }}
+  </main>
+
+  <aside class="flex flex-col container max-w-screen-md mx-auto">
+    {% set blog_posts = get_section(path="blog/_index.md") %}
+    {% for post in blog_posts.pages %}
+      {% set post_kind = post.extra.kind | default(value="blog") %}
+
+      {{ 
+        posts::summary(
+          title=post.title,
+          summary=post.summary,
+          date=post.date,
+          link=post.permalink,
+          kind=post_kind,
+          tags=post.taxonomies.tags,
+        )
+      }}
+
+    {% endfor %}
+  </aside>
+
+{% endblock content %}
