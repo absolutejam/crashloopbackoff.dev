@@ -21,7 +21,6 @@ url = "https://www.openpolicyagent.org/docs/latest/policy-reference/#built-in-fu
 name = "Styra.com blog | How to express OR in Rego"
 url = "https://www.styra.com/blog/how-to-express-or-in-rego/"
 
-
 [extra.image]
 src = "https://www.openpolicyagent.org/img/logos/integrations/conftest.png"
 alt = "conftest logo"
@@ -387,21 +386,21 @@ input.metadata.annotations[value]
 ```
 
 {% note() %}
-- You can selectively opt-in to new keywords using the `future.keywords` package
-  (See [Future keywords](https://www.openpolicyagent.org/docs/latest/policy-language/#future-keywords)
-  for more info)
 
-- You can opt in to some major breaking changes by importing the `rego.v1` package,
-  notably changing rule heads:
+You can either selectively opt-in to new keywords using the `future.keywords` package
+(See <a href="https://www.openpolicyagent.org/docs/latest/policy-language/#future-keywords">Future keywords</a>
+for more info), or you can opt in to some major breaking changes by importing the 
+`rego.v1` package, which notably changes rule heads:
 
-  ```rego
-  # before
-  violation[reason] { ... }
+```rego
+# before
+violation[reason] { ... }
 
-  # after 
-  import rego.v1
-  violation contains reason if { ... }
-  ```
+# after 
+import rego.v1
+violation contains reason if { ... }
+```
+
 {% end %}
 
 ### Helper rules & functions

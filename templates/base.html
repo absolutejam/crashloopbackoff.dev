@@ -13,24 +13,7 @@
 
     <title>{{ config.title }}</title>
 
-    <script>
-      // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
-
-      function toggleTheme() {
-        if (localStorage.theme === 'dark') {
-          localStorage.theme = 'light'
-          document.documentElement.classList.remove('dark')
-        } else {
-          localStorage.theme = 'dark'
-          document.documentElement.classList.add('dark')
-        }
-      }
-    </script>
+    <script src="/scripts/theme.js"></script>
 
   </head>
 
@@ -45,19 +28,5 @@
   <!-- TODO: -->
   <script>lucide.createIcons();</script>
   <script src="/scripts/timeago.js"></script>
-  <script>
-    const navbar = document.querySelector("#sticky-navbar")
-    document.addEventListener("scroll", (event) => {
-      const { top } = navbar.getBoundingClientRect();
-      if (top > 5) {
-        navbar.classList.remove("navbar-sticky")
-      } else {
-        navbar.classList.add("navbar-sticky")
-      }
-    });
-  </script>
-
-  <script>
-  </script>
-
+  <script src="/scripts/sticky-navbar.js"></script>
 </html>

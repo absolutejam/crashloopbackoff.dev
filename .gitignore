@@ -1,9 +1,10 @@
 # TODO: Finish these
-content/pins/
+content/pin/
 content/docs/
-template/pins/
-template/docs
+templates/pins/
+templates/docs/
 static/images/pins
+static/styles/
 
 public/
 node_modules/
