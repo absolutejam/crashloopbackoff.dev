@@ -25,17 +25,18 @@
     <!-- Nav drawer -->
     <div 
       id="drawer-nav" 
-      class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80 dark:bg-gray-800" 
+      class="fixed top-0 left-0 z-40 h-screen px-2 py-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80 dark:bg-gray-800" 
       tabindex="-1" 
       aria-labelledby="drawer-label"
     >
+      {{ layout::site_header() }}
       {{ layout::nav_links() }}
 
       {% block additional_nav %}
       {% endblock additional_nav %}
     </div>
 
-    <div class="flex flex-row justify-between py-6 px-10 items-center">
+    <div class="hidden md:flex flex-row justify-between py-6 px-10 items-center">
       {{ layout::site_header() }}
 
       <!-- Navbar -->
