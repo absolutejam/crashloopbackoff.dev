@@ -31,25 +31,25 @@ const config: Config = {
         "forminput-bg": "var(--forminput-bg)",
         "forminput-border": "var(--forminput-border)",
       },
-      typography: ({ theme }) => ({
+      typography: () => ({
         DEFAULT: {
           css: {
             "--tw-format-body": "var(--format-body)",
             "--tw-format-headings": "var(--format-header)",
-            'blockquote': {
-              'font-style': 'normal',
+            blockquote: {
+              "font-style": "normal",
             },
-            'blockquote::before': {
-              display: 'inline-block',
-              'margin-top': '0 !important',
+            "blockquote::before": {
+              display: "inline-block",
+              "margin-top": "0 !important",
               float: "left",
-              "width": "50px",
+              width: "50px",
             },
-            'blockquote p:first-of-type::before': { 
-              content: 'none',
+            "blockquote p:first-of-type::before": {
+              content: "none",
             },
-            'blockquote p:first-of-type::after': {
-              content: 'none',
+            "blockquote p:first-of-type::after": {
+              content: "none",
             },
           },
         },
