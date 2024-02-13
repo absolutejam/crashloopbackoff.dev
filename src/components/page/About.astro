@@ -1,0 +1,59 @@
+---
+import Head from "@/components/layout/Head.astro";
+import Header from "@/components/layout/Header.astro";
+import Footer from "@/components/layout/Footer.astro";
+
+const { title, description, intro, image } = Astro.props.frontmatter;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <Head title={title} description={description} />
+  </head>
+
+  <body class="flex flex-col min-h-screen justify-start font-body relative">
+    <Header />
+
+    <main class="flex flex-1 flex-col mx-auto container justify-start pt-16 pb-16">
+      <header
+        class="flex flex-col lg:flex-row items-center mx-auto gap-x-6 mb-6"
+      >
+        {image && 
+          <figure
+            class="flex flex-shrink-0 mx-auto lg:mx-0 items-center justify-center rounded-lg overflow-clip bg-gray-100 dark:bg-gray-900"
+          >
+            <img
+              src={image.src}
+              alt={image.alt}
+              class="h-48 w-48 object-center object-contain rounded-lg"
+            />
+          </figure>
+        }
+
+        <div class="flex flex-col justify-center gap-y-1 text-center">
+          <h1
+            class="text-3xl md:text-4xl lg:text-5xl font-black max-w-xl lg:max-w-2xl"
+          >
+            {title}
+          </h1>
+          <p class="text-2xl font-thin">
+            {description}
+          </p>
+        </div>
+      </header>
+
+      <section class="flex flex-col lg:flex-row gap-y-4 lg:gap-x-6 lg:gap-y-0">
+        <div class="flex flex-1 order-1">
+          <div
+            class="format mx-auto dark:format-invert lg:format-lg format-h2:pt-8 format-code:font-mono fopt-2 w-full"
+          >
+            <slot />
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </body>
+</html>

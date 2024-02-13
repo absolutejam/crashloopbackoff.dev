@@ -1,7 +1,0 @@
-{% macro blog_icon(kind) -%}
-{%- set icons = load_data(literal='{
-  "blog": "message-square-text",
-  "default": "message-square"
-}', format="json") -%}
-{{- icons[kind] | default(value=icons["default"]) -}}
-{%- endmacro %}

@@ -1,0 +1,50 @@
+---
+layout: "@/components/page/About.astro"
+title: Hey! 👋
+description: Thanks for checking out my blog
+---
+
+<p class="lead max-w-md mx-auto">
+This is my place for documenting what I know,
+learning what I don't, and sharing what I've discovered.
+</p>
+
+## Me
+
+<figure class="flex flex-col items-center lg:float-right pl-3">
+  <img 
+    class="w-64 h-64 rounded-lg" 
+    src="/img/me-and-missus.jpg" 
+    alt="Me and my better half"
+  />
+</figure>
+
+I'm a DevOps/Platform/Cloud engineer in the North-East of England, and I'm
+passionate about everything infrastructure, development and automation. I love
+learning and I strive to be continually challenged.
+
+I spend my spare time with my family, longboarding, tinkering with side-projects,
+reading fantasy fiction and working out.
+
+## Tech
+
+I try to remain pragmatic and adaptable, so I'm able to learn and use different
+tools, languages and paradigms.
+
+I'm an evangelist of Kubernetes and event-driven architecture; my go-to 
+languges are Go, Rust and Typescript; and I use neovim (btw).
+
+Part of the being in the DevOps space means wearing a lot of hats, and I get
+involved in...
+
+  - Application & infrastructure design and implementation
+  - Streamlining the software delivery lifecycle
+  - Internal tooling, automation & integrations
+  - Observability & following SRE principals
+  - Proactive security and cost analysis
+
+## The blog
+
+The blog is built upon the amazing [Astro](https://astro/build) 
+framework, [TailwindCSS](https://tailwindcss.com) and
+[Flowbite](https://flowbite.com).

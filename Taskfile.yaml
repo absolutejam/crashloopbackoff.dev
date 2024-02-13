@@ -1,35 +1,47 @@
 version: "3"
 
-output: prefixed
-
 tasks:
   default:
     cmd: task --list
 
+  clean:
+    desc: Cleans .astro cache
+    cmds: 
+      - rm -rf .astro/
+      - pnpm astro sync
+
+  deps:
+    desc: Pulls dependencies
+    cmd: pnpm install
+
   serve:
-    desc: Runs Zola & TailwindCSS
+    desc: Runs all servers
     deps:
-      - serve:zola
-      - serve:tailwind
+      - serve:astro
 
-  serve:zola:
-    desc: Runs Zola
-    cmd: zola serve
+  serve:astro:
+    desc: Runs Astro
+    cmd: pnpm astro dev
 
-  serve:tailwind:
-    desc: Runs tailwind CSS builder process
-    cmd: npx tailwindcss -i styles/styles.css -o static/styles/styles.css --watch
+  preview:
+    desc: Previews the site
+    cmd: pnpm astro preview
+
+  astro:
+    desc: Runs `astro` CLI
+    cmd: pnpm astro
 
   check:
     desc: Runs checks & linters
     cmds:
       - npx eslint content/**
-      - zola check
+      - pnpm astro check
 
   build:
     desc: Builds production app
     env:
       NODE_ENV: production
     cmds:
-      - npx tailwindcss -i styles/styles.css -o static/styles/styles.css
-      - zola build
+      - pnpm astro check
+      # - npx tailwindcss -i src/styles/global.css -o static/styles/styles.css
+      - pnpm astro build

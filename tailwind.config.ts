@@ -1,13 +1,11 @@
 import type { Config } from "tailwindcss";
 
 import colors from "tailwindcss/colors";
-import defaultTheme from "tailwindcss/defaultTheme"
+import defaultTheme from "tailwindcss/defaultTheme";
 
 const config: Config = {
   content: [
-    "./themes/**/*.{html,js,ts,jsx,tsx,md,mdx}",
-    "./templates/**/*.{html,js,ts,jsx,tsx,md,mdx}",
-    "./content/**/*.{html,js,ts,jsx,tsx,md,mdx}",
+    "./src/**/*.{html,astro,js,ts,jsx,tsx,md,mdx}",
     "./node_modules/flowbite/**/*.js",
     "./node_modules/lucide/**/*.js",
   ],
@@ -20,8 +18,8 @@ const config: Config = {
       },
     },
     fontFamily: {
-      'body': ["Inter", ...defaultTheme.fontFamily.sans],
-      'mono': ["JetBrains Mono", ...defaultTheme.fontFamily.mono],
+      body: ["Inter", ...defaultTheme.fontFamily.sans],
+      mono: ["JetBrains Mono", ...defaultTheme.fontFamily.mono],
     },
     extend: {
       colors: {
@@ -36,15 +34,30 @@ const config: Config = {
       typography: ({ theme }) => ({
         DEFAULT: {
           css: {
-            '--tw-format-body': 'var(--format-body)',
-            '--tw-format-headings': 'var(--format-header)',
+            "--tw-format-body": "var(--format-body)",
+            "--tw-format-headings": "var(--format-header)",
+            'blockquote': {
+              'font-style': 'normal',
+            },
+            'blockquote::before': {
+              display: 'inline-block',
+              'margin-top': '0 !important',
+              float: "left",
+              "width": "50px",
+            },
+            'blockquote p:first-of-type::before': { 
+              content: 'none',
+            },
+            'blockquote p:first-of-type::after': {
+              content: 'none',
+            },
           },
         },
       }),
     },
   },
   plugins: [
-    require('flowbite/plugin'),
+    require("flowbite/plugin"),
     require("@tailwind-plugin/expose-colors")({
       extract: ["gray"],
     }),

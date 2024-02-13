@@ -1,0 +1,59 @@
+---
+import NavLink from "./NavLink.astro";
+---
+
+<!-- Links -->
+<ul class="flex font-medium flex-col p-2 mt-0 md:flex-row md:items-end md:p-0">
+  <NavLink href="/blog" text="Blog" icon="book-open" />
+  <NavLink href="/about" text="About" icon="at-sign" />
+
+  <!-- Theme button -->
+  <li
+    class="block group font-medium rounded-lg transition-all duration-200 hover:bg-border"
+  >
+    <button
+      type="button"
+      data-toggle-theme
+      class="flex w-full flex-1 items-center px-3 lg:px-2 py-2 gap-x-3 md:gap-x-2 text-gray-700 dark:text-gray-200"
+    >
+      <i
+        data-lucide="sun"
+        class="block dark:hidden
+          group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all duration-200"
+      ></i>
+      <i
+        data-lucide="moon"
+        class="dark:block hidden
+          group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all duration-200"
+      ></i>
+      <span class="sr-only">Toggle theme</span>
+      <span class="block md:hidden">Toggle theme</span>
+    </button>
+  </li>
+
+  <script>
+    if (
+      localStorage.theme === "dark" ||
+      (!("theme" in localStorage) &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
+    const buttons = document.querySelectorAll("[data-toggle-theme]");
+
+    buttons.forEach((el) =>
+      el.addEventListener("click", () => {
+        if (localStorage.theme === "dark") {
+          localStorage.theme = "light";
+          document.documentElement.classList.remove("dark");
+        } else {
+          localStorage.theme = "dark";
+          document.documentElement.classList.add("dark");
+        }
+      }),
+    );
+  </script>
+</ul>

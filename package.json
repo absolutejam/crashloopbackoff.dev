@@ -1,18 +1,21 @@
 {
-  "name": "absolutejam.co.uk",
-  "version": "0.1.0",
-  "private": true,
+  "name": "astro",
+  "type": "module",
+  "version": "0.0.1",
   "dependencies": {
+    "@astrojs/check": "^0.5.2",
+    "@astrojs/mdx": "^2.1.1",
+    "@astrojs/rss": "^4.0.5",
+    "@astrojs/sitemap": "^3.0.5",
+    "@astrojs/tailwind": "^5.1.0",
     "@tailwind-plugin/expose-colors": "^1.1.7",
-    "@tailwindcss/typography": "^0.5.10",
+    "astro": "^4.3.5",
     "flowbite": "^2.2.1",
-    "flowbite-typography": "^1.0.3"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "autoprefixer": "^10.0.1",
-    "eslint": "^8",
-    "postcss": "^8",
-    "tailwindcss": "^3.3.0"
+    "flowbite-typography": "^1.0.3",
+    "lucide": "^0.323.0",
+    "prettier": "^3.2.5",
+    "prettier-plugin-astro": "^0.13.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
   }
 }

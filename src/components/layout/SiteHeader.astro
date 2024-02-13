@@ -1,0 +1,30 @@
+---
+import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
+---
+
+<header class="flex flex-col md:flex-nowrap items-center justify-between">
+  <div class="flex justify-start gap-x-2 w-full px-3">
+    <div class="flex flex-row items-center py-2 gap-x-2">
+      <div
+        class="flex w-14 h-14 flex-shrink-0 items-end justify-start pl-1 pb-1 bg-foreground rounded text-background"
+      >
+        <i data-lucide="terminal" class="animate-pulse dark:text-background"
+        ></i>
+      </div>
+
+      <div class="flex flex-col">
+        <a href="/">
+          <span
+            class="self-center font-mono text-xl lg:text-2xl font-black whitespace-nowrap dark:text-white"
+          >
+            {SITE_TITLE}
+          </span>
+        </a>
+
+        <p class="flex -mt-1 text-sm leading-tight">
+          {SITE_DESCRIPTION}
+        </p>
+      </div>
+    </div>
+  </div>
+</header>

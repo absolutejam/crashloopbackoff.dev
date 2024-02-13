@@ -1,0 +1,42 @@
+---
+import { Head, Header, Footer } from "@/components/layout/index.astro";
+import BlogPostSummary from "@/components/BlogPostSummary.astro";
+
+import { SITE_TITLE, SITE_DESCRIPTION } from "@/consts";
+
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog"))
+  .map((post) => ({
+    ...{ slug: post.slug, ...post.data },
+  }))
+  .sort((a, b) => b.created_at.valueOf() - a.created_at.valueOf());
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <Head title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
+    <Header />
+
+    <main class="flex flex-col container max-w-screen-lg mx-auto gap-y-10">
+      <section class="mt-16">
+        <h1 class="text-5xl font-black mb-4">Blog posts</h1>
+      </section>
+
+      <ul class="flex flex-col gap-y-10">
+        {
+          posts.map((post) => (
+            <li class="py-4">
+              <BlogPostSummary {...post} />
+            </li>
+          ))
+        }
+      </ul>
+    </main>
+
+    <Footer />
+  </body>
+</html>
