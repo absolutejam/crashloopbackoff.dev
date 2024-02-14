@@ -7,6 +7,7 @@
     "@astrojs/mdx": "^2.1.1",
     "@astrojs/rss": "^4.0.5",
     "@astrojs/sitemap": "^3.0.5",
+    "@astrojs/starlight": "^0.18.0",
     "@astrojs/tailwind": "^5.1.0",
     "@tailwind-plugin/expose-colors": "^1.1.7",
     "astro": "^4.3.5",
