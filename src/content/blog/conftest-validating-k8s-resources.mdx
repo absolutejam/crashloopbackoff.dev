@@ -27,6 +27,8 @@ links:
     url: https://www.styra.com/blog/how-to-express-or-in-rego/
 ---
 
+import { Note } from "@/components/shortcodes/index.astro"
+
 While the Kubernetes API server will provide basic schema validation for
 Kubernetes manifests, we often want to be able to apply our own validation
 rules to the actual contents of the manifests.
@@ -236,7 +238,8 @@ And if we run this with `-o json`, we can see that the other keys in the
 ]
 ```
 
-{% note() %}
+<Note>
+
 Conftest uses OPA under the hood, which works by building a JSON object that
 is the result of evaluating each rule against the input data.
 
@@ -258,7 +261,8 @@ This is because each passing rule is adding to the `deny` array.
 
 Then this data structure is parsed by Conftest to provide more relevant console
 output or structured data (when using `-o json`)
-{% end %}
+
+</Note>
 
 ## Building more complex rules
 
@@ -383,7 +387,7 @@ Where the older syntax (which is still usable) is:
 input.metadata.annotations[value]
 ```
 
-{% note() %}
+<Note>
 
 You can either selectively opt-in to new keywords using the `future.keywords` package
 (See <a href="https://www.openpolicyagent.org/docs/latest/policy-language/#future-keywords">Future keywords</a>
@@ -399,7 +403,7 @@ import rego.v1
 violation contains reason if { ... }
 ```
 
-{% end %}
+</Note>
 
 ### Helper rules & functions
 
@@ -639,7 +643,8 @@ FAIL - ./resources/secret.yaml - secrets.example - Bad key detected: token-a
 FAIL - ./resources/secret.yaml - secrets.example - Bad key detected: token-c
 ```
 
-{% note() %}
+<Note>
+
 If you are requiring data to be provided, I advise to always add separate rules
 that verify the existence & shape of the data.
 
@@ -653,7 +658,8 @@ violation contains "No bad_keys provided" if not data.bad_keys
 Without these rules to indicate bad data, the above rule would fail when
 trying to access `data.bad_keys`, meaning we do not see a failure in the Conftest
 report
-{% end %}
+
+</Note>
 
 ## Merging data for more complex policies
 

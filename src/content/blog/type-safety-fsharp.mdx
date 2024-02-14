@@ -18,6 +18,8 @@ links:
     url: https://github.com/fsprojects/FSharp.UMX
 ---
 
+import { Note } from "@/components/shortcodes/index.astro"
+
 I enjoy using statically-typed languages for obvious benefit of compile-time
 safety, but an overlooked feature is the added context that rich types can provide.
 
@@ -130,7 +132,7 @@ sendEmail body email subject // won't compile!
 As you can see, we're refining the type for the compiler, but the underlying
 representation is still a vanilla `string`.
 
-{% note() %}
+<Note>
 
 It's worth noting that there is a trade-off when using a UoM vs. a distinct
 type (record or discriminated union), but the choice depends on your requirements
@@ -138,7 +140,8 @@ and your domain.
 
 For example, you can't limit the construction of UoMs, nor can you add
 members to specific measures (as the type is essentially still a `string`).
-{% end %}
+
+</Note>
 
 ## Phantom types
 
@@ -178,7 +181,7 @@ type IFileSystem = interface end           // marker interface
 type SftpFileSystem = inherit IFileSystem
 type LocalFileSystem = inherit IFileSystem
 
-type FilePath<'filesystem when 'filesystem :> IFileSystem> = FilePath of string
+type FilePath<'fs when 'fs:> IFileSystem> = FilePath of string
 
 let sftpPath: FilePath<SftpFileSytem> = FileSystem<_> "foo"
 let localPath: FilePath<LocalFileSytem> = FileSystem<_> "bar"
@@ -197,13 +200,13 @@ We can still coerce one type into the other - since they contain the same
 underlying data - but this is an explicit act, and we can even secure this
 with some runtime checks.
 
-{% note() %}
+<Note>
 
 The `IFileSystem` interface - and those inheriting it, such as `SftpFileSystem`
 & `LocalFileSystem` - are 'marker interfaces' as they provide no additional
 members, and are only used as a way of 'tagging' types.
 
-{% end %}
+</Note>
 
 Now, we can see that type definitions are much more clear:
 
@@ -214,8 +217,6 @@ FilePath -> FilePath
 // To
 FilePath<LocalFileSystem> -> FilePath<SftpFileSystem>
 ```
-
-And we can
 
 And here are some example implementations leveraging our new and improved type:
 
@@ -233,5 +234,5 @@ type LocalToRemoteMover (sshConfig: SshConfig) =
 
 // A generic file validator function that can be easily combined
 type IFileValidator<'fs when 'fs :> IFileSystem> =
-    abstract Validate: FilePath<'filesystem> -> Async<Result<FilePath<'fs>, exn>>
+    abstract Validate: FilePath<'fs> -> Async<Result<FilePath<'fs>, exn>>
 ```
