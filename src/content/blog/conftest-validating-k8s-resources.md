@@ -134,7 +134,7 @@ data:
 
 A basic policy for this could look like:
 
-```rego
+```go
 package secrets.example
 
 import rego.v1
@@ -181,7 +181,7 @@ therefore the entire rule will pass, reporting the failure.
 However, if we run this rule against a `Deployment` manifest, the first expression will
 evaluate as false:
 
-```rego
+```go
 input.kind == "Secret"
 ```
 
@@ -199,7 +199,7 @@ optionally suffix these terms with an underscored identifier.
 
 - `warn` - Prints a warning instead of a failure in the console output
 
-```rego
+```go
 package secrets.example
 
 token_name := "token-b"
@@ -271,7 +271,7 @@ return multiple results. This essentially 'forks' the execution of the rule
 for each item. While this can take some getting used to, it's also incredibly
 powerful.
 
-```rego
+```go
 package secrets.example
 
 import rego.v1
@@ -300,7 +300,7 @@ If you instead wanted to collect multiple values, you can use
 use a [comprehension](https://www.openpolicyagent.org/docs/latest/policy-language/#comprehensions).
 This can be used to build an array, a set or an object.
 
-```rego
+```go
 keys := [key | some key, value in input.metadata.annotations]
 #        ^- key is the yielded value
 # ^- keys is an array of the annotation keys
@@ -309,7 +309,7 @@ keys := [key | some key, value in input.metadata.annotations]
 The body inside the comprehension can also contain additional expressions,
 allowing us to filter or transform elements:
 
-```rego
+```go
 package secrets.example
 
 pkey_header := "-----BEGIN PRIVATE KEY"
@@ -371,7 +371,7 @@ but you may still find lots of examples online using the old syntax.
 For example, iterating over an array can be written as following when importing
 `future.keywords.in`/`rego.v1`:
 
-```rego
+```go
 import future.keywords.in
 
 some value in some_array
@@ -379,7 +379,7 @@ some value in some_array
 
 Where the older syntax (which is still usable) is:
 
-```rego
+```go
 input.metadata.annotations[value]
 ```
 
@@ -390,7 +390,7 @@ You can either selectively opt-in to new keywords using the `future.keywords` pa
 for more info), or you can opt in to some major breaking changes by importing the
 `rego.v1` package, which notably changes rule heads:
 
-```rego
+```go
 # before
 violation[reason] { ... }
 
@@ -408,7 +408,7 @@ violation contains reason if { ... }
 We can also define helper rules which allow us to abstract some of our logic,
 but won't produce a failure in Conftest.
 
-```rego
+```go
 # Helper rule that simply returns true or false
 is_tokens_secret := true if {
   input.kind == "Secret"
@@ -432,7 +432,7 @@ is_tokens_secret := input.metadata.name if {
 
 We can then leverage these helper rules in our rules:
 
-```rego
+```go
 is_tokens_secret := input.metadata.name if {
   input.kind == "Secret"
   contains(input.metadata.name, "tokens")
@@ -450,7 +450,7 @@ violation contains reason if {
 
 As well as this, we can define functions which allow us to parameterise the input:
 
-```rego
+```go
 # no return value, so implicitly true or false
 is_cert(value) if {
   contains(value, "---BEGIN")
@@ -495,7 +495,7 @@ For example, [this blog post by Styra](https://www.styra.com/blog/how-to-express
 explains how to model 'or' logic, by definining the same helper rule/function multiple
 times.
 
-```rego
+```go
 package secrets.example
 # (A contrived example)
 
@@ -527,7 +527,7 @@ FAIL - ./resources/secret.yaml - secrets.example - Secret contains a token
 Building upon the previous example, if we were to try and return different values
 from this helper rule:
 
-```rego
+```go
 has_token := input.data["token-a"]
 
 has_token := value if {
@@ -549,7 +549,7 @@ This is because it `has_token` is a 'complete rule'.
 However, we can also define 'partial rules' which are allowed to return multiple
 values as a set:
 
-```rego
+```go
 package secrets.example
 # (Another contrived example)
 
@@ -591,7 +591,7 @@ between files.
 So far, we've written some fairly static rules. Sure, we can add more flexibility
 by making them more data-driven:
 
-```rego
+```go
 bad_keys := {"token-a", "token-b", "token-b"}
 
 violation contains reason if {
@@ -618,7 +618,7 @@ bad_keys:
 
 This is then merged into the `data` object.
 
-```rego
+```go
 package secrets.example
 
 violation contains reason if {
@@ -646,7 +646,7 @@ that verify the existence & shape of the data.
 This safeguards against the event you forget to pass any data, or you provide
 the wrong data.
 
-```rego
+```go
 violation contains "No bad_keys provided" if not data.bad_keys
 ```
 
@@ -734,7 +734,7 @@ spec:
 
 With the following policy:
 
-```rego
+```go
 package secrets.example
 
 import rego.v1
@@ -799,7 +799,7 @@ violation_only_valid_secret_data_mapped contains reason if {
 
 By running:
 
-```rego
+```go
 conftest test ./resources/pod.yaml ./resources.secret.yaml
 ```
 
