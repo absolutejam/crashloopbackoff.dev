@@ -18,11 +18,12 @@ const posts = (await getCollection("blog"))
   <head>
     <Head title={SITE_TITLE} description={SITE_DESCRIPTION} />
   </head>
-  <body>
+
+  <body class="flex flex-col min-h-screen justify-start font-body relative">
     <Header />
 
-    <main class="flex flex-col container max-w-screen-lg mx-auto gap-y-10">
-      <section class="mt-16">
+    <main class="flex flex-col container max-w-screen-lg mx-auto gap-y-2 pt-20">
+      <section>
         <h1 class="text-5xl font-black mb-4">Blog posts</h1>
       </section>
 
