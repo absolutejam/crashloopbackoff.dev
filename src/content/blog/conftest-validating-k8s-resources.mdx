@@ -463,15 +463,16 @@ is_cert(value) if {
 # or alternatively, we could write it like so:
 # is_cert(value) := contains(value, "---BEGIN")
 
-#                                            v-- the return value,
-has_private_keys(secret_data, content) := result if {
+#                    v-- the object to search
+#                                  v-- the return value,
+has_private_keys(secret_data) := result if {
   input.kind == "Secret" # We can still access `input`
 
-  # v- comprehension used to build up the `result` variable, which we return
+  # v-- comprehension used to build up the `result` variable, which we return
   result := [result |
     some name, value in secret_data
     decoded := base64.decode(value)
-    is_cert(decoded, content)
+    is_cert(decoded)
     result := {
       "name": name,
       "key": decoded,
