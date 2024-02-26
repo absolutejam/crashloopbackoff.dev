@@ -1,0 +1,44 @@
+---
+import { Head, Header, Footer, Skeleton } from "@/components/layout/index.astro";
+
+import { getEntry } from "astro:content"
+
+const page = await getEntry("pages", "about")
+const { title, description } = page.data
+const { Content } = await page.render()
+---
+
+<Skeleton>
+  <Head slot="head" title={title} description={description} />
+
+  <Header />
+
+  <main class="flex flex-1 flex-col mx-auto justify-start py-16 px-4">
+    <header
+      class="flex flex-col lg:flex-row items-center mx-auto gap-x-6 mb-6"
+    >
+      <div class="flex flex-col justify-center gap-y-1 text-center">
+        <h1
+          class="text-3xl md:text-4xl lg:text-5xl font-black max-w-xl lg:max-w-2xl"
+        >
+          {title}
+        </h1>
+        <p class="text-2xl font-thin">
+          {description}
+        </p>
+      </div>
+    </header>
+
+    <section class="flex flex-col lg:flex-row gap-y-4 lg:gap-x-6 lg:gap-y-0">
+      <div class="flex flex-1 order-1">
+        <div
+          class="format mx-auto dark:format-invert lg:format-lg format-h2:pt-8 format-code:font-mono w-full"
+        >
+          <Content />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Skeleton>

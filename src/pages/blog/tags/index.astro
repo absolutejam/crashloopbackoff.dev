@@ -1,8 +1,6 @@
 ---
-import { Head, Header, Footer } from "@/components/layout/index.astro";
+import { Skeleton, Head, Header, Footer } from "@/components/layout/index.astro";
 import BlogPostSummary from "@/components/BlogPostSummary.astro";
-
-import { SITE_TITLE, SITE_DESCRIPTION } from "@/consts";
 
 import { getCollection, type CollectionEntry } from "astro:content";
 
@@ -26,54 +24,50 @@ for (const post of posts) {
 };
 ---
 
-<!doctype html>
-<html lang="en" class="scroll-smooth">
-  <head>
-    <Head title={SITE_TITLE} description={SITE_DESCRIPTION} />
-  </head>
-  <body class="flex flex-col min-h-screen justify-start font-body relative">
-    <Header />
+<Skeleton>
+  <Head slot="head" title="Blog posts - By tag" />
 
-    <main class="flex flex-col container max-w-screen-lg mx-auto gap-y-10 pb-20">
-      <section class="mt-16">
-        <h1 class="text-5xl font-black mb-4">
-          Tags
-        </h1>
-      </section>
+  <Header />
 
-      <ul class="flex flex-col gap-y-20">
-        {
-          [...grouped.keys()].sort((a, b) => a > b ? 1 : -1).map((tag) => {
-          const posts = grouped.get(tag) || [];
+  <main class="flex flex-col container max-w-screen-lg mx-auto gap-y-10 pb-20">
+    <section class="mt-16">
+      <h1 class="text-5xl font-black mb-4">
+        Tags
+      </h1>
+    </section>
 
-          return posts.map((post) => (
-            <li>
-              <section>
-                <a 
-                  href={`/blog/tags/#${tag}`}
-                  class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
-                  >
-                  <h2 
-                    id={tag}
-                    aria-label={tag}
-                    class="text-3xl font-bold">
-                    {tag}
-                  </h2>
-                </a>
+    <ul class="flex flex-col gap-y-20">
+      {
+        [...grouped.keys()].sort((a, b) => a > b ? 1 : -1).map((tag) => {
+        const posts = grouped.get(tag) || [];
 
-                <ul>
-                  <li class="py-4">
-                    <BlogPostSummary {...post} />
-                  </li>
-                </ul>
-              </section>
-            </li>
-            ))
-          })
-        }
-      </ul>
-    </main>
+        return posts.map((post) => (
+          <li>
+            <section>
+              <a 
+                href={`/blog/tags/#${tag}`}
+                class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
+                >
+                <h2 
+                  id={tag}
+                  aria-label={tag}
+                  class="text-3xl font-bold">
+                  {tag}
+                </h2>
+              </a>
 
-    <Footer />
-  </body>
-</html>
+              <ul>
+                <li class="py-4">
+                  <BlogPostSummary {...post} />
+                </li>
+              </ul>
+            </section>
+          </li>
+          ))
+        })
+      }
+    </ul>
+  </main>
+
+  <Footer />
+</Skeleton>

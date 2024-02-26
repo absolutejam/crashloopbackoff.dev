@@ -1,0 +1,79 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+type Props = {
+  entries: TocEntry[];
+};
+
+export type TocEntry = {
+  name: string,
+  link: string,
+  children?: TocEntry[],
+}
+
+export function buildToc(headings: MarkdownHeading[]): TocEntry[] {
+  return headings.reduce((acc, { slug, text, depth }) => {
+    const tocItem = {
+      link: slug,
+      name: text,
+      children: []
+    }
+
+    if (depth === 2) {
+      acc.push(tocItem);
+    } else if (depth === 3) {
+      // Inject into the last item's `children`, if it exists
+      const last = acc.at(-1);
+      if (!last) { return acc }
+
+      if (!last.children) {
+        last.children = []
+      }
+      last.children.push(tocItem);
+    }
+
+    return acc;
+  }, new Array<TocEntry>())
+}
+
+const { entries } = Astro.props;
+---
+
+<>
+  {
+    entries.map((entry) => {
+      const children =
+        entry.children && entry.children.length > 0 ? (
+          <li>
+            <ul class="ml-4 -space-y-2">
+              {entry.children.map((subentry) => (
+                <li>
+                  <a
+                    href={`#${subentry.link}`}
+                    class="flex p-3 rounded hover:z-10 hover:bg-gray-100 dark:hover:bg-gray-900"
+                  >
+                    <span>{subentry.name}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ) : null;
+
+      return (
+        <>
+          <li>
+            <a
+              href={`#${entry.link}`}
+              class="flex items-center p-3 rounded hover:z-10 hover:bg-gray-100 dark:hover:bg-gray-900"
+            >
+              <span>{entry.name}</span>
+            </a>
+          </li>
+
+          {children}
+        </>
+      );
+    })
+  }
+</>

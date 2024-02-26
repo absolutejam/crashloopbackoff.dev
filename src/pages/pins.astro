@@ -1,42 +1,23 @@
 ---
-import { getCollection } from "astro:content";
-
-import {
-  Head,
-  Header,
-  Footer,
-} from "@/components/layout/index.astro";
+import { Head } from "@/components/layout/index.astro";
 import TableOfContents, {
   type TocEntry,
   buildToc,
 } from "@/components/TableOfContents.astro";
 import Post from "@/components/pages/Post.astro";
 
-export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: post,
-  }));
-}
+import { getEntry } from "astro:content";
 
-const post = Astro.props;
-const { Content, headings } = await post.render();
-const {
-  title,
-  description,
-  created_at: createdAt,
-  updated_at: updatedAt,
-  image,
-  links,
-} = post.data;
+const page = await getEntry("pages", "pins");
+const { title, description } = page.data;
+const { Content, headings } = await page.render();
 
+const links: TocEntry[] = [];
 const tocItems = buildToc(headings);
 ---
 
 <Head slot="head" title={title} description={description} />
-
-<Post {...{ title, description, image }}>
+<Post {...{ title, description }}>
   <Content />
 
   <div slot="side">
@@ -57,4 +38,3 @@ const tocItems = buildToc(headings);
     )
   }
 </Post>
-

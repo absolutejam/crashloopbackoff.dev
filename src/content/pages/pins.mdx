@@ -1,0 +1,136 @@
+---
+title: 📌 Pins
+description: Tools that I recommend and rely on
+---
+
+## 🛠️ CLI, automation & build tools
+
+### Terminal tools
+
+I spend most of my time in the terminal, so I like to rely on tools tha will
+speed me up and allow me to simplify complex workflows.
+
+  - [Neovim](https://neovim.io/) - The best text editor in the world ❤️
+  - [ripgrep](https://github.com/BurntSushi/ripgrep) - Blazing fast 🔥 grep alternative
+  - [fzf](https://github.com/junegunn/fzf) - Fuzzy finder
+  - [jq](https://jqlang.github.io/jq/) & [yq](https://mikefarah.gitbook.io/yq/) -
+    For JSON and YAML processing
+  - [starship.rs](https://starship.rs/) - Cross-platform terminal prompt
+  - [bat](https://github.com/sharkdp/bat) - Better cat, with syntax highlighting
+  - [eza](https://eza.rocks) - A modern alternative to `ls`
+  - [delta](https://github.com/dandavison/delta) - A syntax-highlighting pager for git, diff, and grep output
+
+I also rely heavily on the following TUI applications fro ease of use:
+
+  - [k9s](https://k9scli.io/) - Kubernetes TUI
+  - [LazyGit](https://github.com/jesseduffield/lazygit) - Git TUI 
+  - [LazyDocker](https://github.com/jesseduffield/lazydocker) - Docker TUI
+
+### Build tools
+
+  - [Task](https://taskfile.dev) - 
+    `make`, but less sucky and data-driven. I use `Task` as standard in all of
+    my projects to make all of the dev & build workflows discoverable and easy
+    to run.
+
+
+
+## Ops
+
+### Security & backups
+
+  - [WAL-G](https://wal-g.readthedocs.io/PostgreSQL/) **(Postgres backups)** -
+    Hands-down the easiest way to handle backups on vanilla Postgres instances.  
+
+    Ships WAL & full backups to S3-compatible storage and manages pulling
+    backups to restore. You can even configure a replica to stream these WAL
+    entries.
+
+## Programming
+
+### Go
+
+Go is a great language due to its fast compile times :zap:, simple syntax,
+top-tier stdlib & library ecosystem and unparalleled concurrency model. 
+
+While its type-system isn't as rich as something like Rust or F#, I really enjoy
+how easy it is to be productive in Go.
+
+  - [Echo](https://echo.labstack.com/) **(Web framework)** - 
+    My favourite, fully-featured web framework that builds upon `net/http`
+
+  - [Charm log](https://github.com/charmbracelet/log) **(Logging)** - 
+    Flexible and colourful logging library with first-class structured logging 
+    support. From the amazing team at [Charm.sh](https://charm.sh).
+
+  - [Cobra](https://cobra.dev/) **(CLI)** - 
+    The de-facto standard in building rich CLI applications. Provides all the
+    usual bells and whistles (help, autocompletion).
+
+  - [sqlc](https://docs.sqlc.dev/) **(DB)** - 
+    Generates types and DB implementations from DDL, allowing a SQL-first experience. 
+    Supports Postgres, MySQL and SQLite.
+
+  - [Validator](https://github.com/go-playground/validator) **(Validation)** - 
+    Takes the hassle out out of validating your structs.
+
+  - [Templ](https://templ.guide/) **(Templating)** - 
+    While Go ships with a powerful templating language built-in, it lacks 
+    type-safety and can be cumbersome to use due to lack of editor/LSP support.
+
+    Templ resolves all of these issues and compiles down to actual Go code, as
+    well as providing features that parallel the likes of JSX.
+
+### Rust
+
+Rust is really powerful language that provides high-level, no-cost abstractions
+(algebraic data-types, traits) with the performance of a really low-level language.
+
+I personally don't need to eek out every last ounce of performance in my day-to-day
+usage, but the rich type system allows for safety & expressivity unparalleled by
+any other language, coupled with a killer macro system to cut out boilerplate.
+
+  - [Clap](https://github.com/clap-rs/clap) **(CLI)** - 
+    Provides a declarative (macrobased) and imperative API for building rich
+    CLI applications, with help and autocompletion out of the box.
+
+  - [sqlx](https://docs.rs/sqlx/latest/sqlx/) **(SQL)** - 
+    A SQL-first library that also provides compile-time verificiation against a
+    schema.
+
+### F#
+
+While I don't do much F# these days, I still follow the ecosystem because it's
+a really powerful, fast and syntactically-light language with a friendly community.
+
+F# was first foray into statically-typed, functional programming and it excels
+are providing a rich type-system (discriminated unions, interfaces) while also 
+allowing you to still write procedural and OOP when needed.
+
+  - [Falco](https://www.falcoframework.com/docs/) **(Web framework)** - 
+    Compose functions as handlers, computation expressions for ease-of-use and
+    a type-safe HTML DSL.
+
+  - [SqlHydra](https://github.com/JordanMarr/SqlHydra) **(DB)** - 
+    Generates types and DB implementations from DDL, allowing a SQL-first experience. 
+    Supports a load of DBs.
+
+  - [AsyncSeq](https://fsprojects.github.io/FSharp.Control.AsyncSeq/) **(Streams)** -
+    An async sequence abstraction with custom computation expression and 
+    combinators galore.
+
+  - [FsErrorHandlingToolkit](https://demystifyfp.gitbook.io/fstoolkit-errorhandling) 
+    **(Error handling)** -
+    An auto-include for any F# project. Provides computation expressions such as 
+    `asyncResult {}`
+
+### Web
+
+This category is massive, but I'm going to pick a couple of tools/frameworks
+I really like
+
+  - [Astro](https://astro.build/) - 
+    Simple but powerful framework for building static websites with all the 
+    usual tooling (JSX & components).  
+    Also does SSR and island-architecture, but I haven't touched
+    these yet!

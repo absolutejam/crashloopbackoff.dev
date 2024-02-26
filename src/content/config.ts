@@ -1,6 +1,11 @@
 import { defineCollection, z } from "astro:content";
 import { docsSchema } from "@astrojs/starlight/schema";
 
+const linksSchema = z.object({
+  name: z.string(),
+  link: z.string(),
+})
+
 const blog = defineCollection({
   type: "content",
   schema: z.object({
@@ -13,9 +18,12 @@ const blog = defineCollection({
       src: z.string(),
       alt: z.string(),
     }),
+    links: z.array(linksSchema).optional().default([]),
   }),
 });
 
 const docs = defineCollection({ schema: docsSchema() });
 
-export const collections = { blog, docs };
+const pages = defineCollection({ type: "content" })
+
+export const collections = { blog, docs, pages };
