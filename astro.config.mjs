@@ -4,11 +4,16 @@ import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 
 import starlight from "@astrojs/starlight";
+import { astroExpressiveCode } from "@astrojs/starlight/expressive-code";
 
 const starlightIntegrations = [
+  astroExpressiveCode({
+    themes: ["one-dark-pro"],
+  }),
   starlight({
     title: "📖 Docs",
     plugins: [],
+    customCss: ["/src/styles/starlight.css"],
     disable404Route: true,
     expressiveCode: false,
     sidebar: [
@@ -17,8 +22,12 @@ const starlightIntegrations = [
         autogenerate: { directory: "docs/devops" },
       },
       {
-        label: "Programming",
-        autogenerate: { directory: "docs/programming" },
+        label: "Dev",
+        autogenerate: { directory: "docs/dev" },
+      },
+      {
+        label: "Tooling",
+        autogenerate: { directory: "docs/tooling" },
       },
     ],
     editLink: {
@@ -42,4 +51,3 @@ export default defineConfig({
     "/": "/blog",
   },
 });
-
