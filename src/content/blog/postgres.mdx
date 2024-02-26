@@ -1,0 +1,259 @@
+---
+title: Turning rows into nested objects
+description: Beating object-relational impedance mismatch with Postgres
+created_at: 2024-02-20
+
+tags:
+  - postgres
+
+image:
+  src: /img/postgres.png
+  alt: The Postgresql logo
+---
+
+import { Note } from "@/components/shortcodes/index.astro"
+
+The data representation when querying a relational database often doesn't match
+the representation we use inside our programming language of choice. 
+
+This challenge is called 
+[Object-relational impedance mismatch](https://en.wikipedia.org/wiki/Object%E2%80%93relational_impedance_mismatch),
+and is apparent when we want to translate denormalised data in rows to nested 
+objects and arrays, especially when joining across tables in a one-to-many or 
+many-to-many scenario.
+
+Fortunately, Postgres provides 
+[LATERAL subqueries](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-LATERAL)
+coupled with native JSON processing to make this easy!
+
+<Note>
+
+Don't blindly trust the recommendations of a stranger on the internet!
+
+If you are taking this approach - especially in your application's hot path -
+then I'd suggest that you benchmark it against the alternatives (ie. returning
+joined rows and processing in the app).
+
+I personally rely on this method when doing any investigation, especially when 
+coupled with `jq`.
+
+</Note>
+
+## JOINing in
+
+Given the following DDL the creates 3 tables with a 'many-to-many' relationship:
+```sql
+create table posts (
+  id      uuid not null,
+  name    text not null,
+  content text not null,
+  
+  primary key(id)
+);
+
+create table tags (
+  id   uuid not null,
+  name text not null,
+  
+  primary key(id)
+);
+
+create table post_tags (
+  post_id              uuid not null,
+  tag_id               uuid not null,
+  
+  primary key(post_id, tag_id),
+  foreign key(post_id) references posts(id),
+  foreign key(tag_id)  references tags(id)
+);
+```
+
+Which we seed this with some data:
+```sql
+
+insert into posts (id, name, content) 
+values 
+  ('bc963376-b5c4-4cf4-9705-999abd515c96', 'Chasing the Gopher', '...'),
+  ('fd154bb5-d112-4a54-845e-bdc57d72ab08', 'Feeling Rusty', '...'),
+  ('ceb9082f-eb92-4cc6-b0f5-3f358ff71bd0', 'Taming the Python', '...')
+;
+
+insert into tags (id, name) 
+values 
+  ('a64b2f87-504d-4f3e-b989-916ffc0a507b', 'statically-typed'),
+  ('31fad421-385a-484c-ad78-72dc4b9afaba', 'dynamically-typed'),
+  ('dde3159b-f7bf-46e0-b096-a9ec123bec90', 'garbage-collected'),
+  ('46b649c6-7e5e-4327-8a2a-610c86800f03', 'manual-memory-management')
+;
+
+insert into post_tags (post_id, tag_id)
+values
+  (
+    'bc963376-b5c4-4cf4-9705-999abd515c96', -- Chasing the Gopher
+    'a64b2f87-504d-4f3e-b989-916ffc0a507b'  -- statically-typed
+  ),
+  (
+    'fd154bb5-d112-4a54-845e-bdc57d72ab08', -- Feeling Rusty
+    'a64b2f87-504d-4f3e-b989-916ffc0a507b'  -- statically-typed
+  ),
+  (
+    'ceb9082f-eb92-4cc6-b0f5-3f358ff71bd0', -- Taming the Python
+    '31fad421-385a-484c-ad78-72dc4b9afaba'  -- dynamically-typed
+  ),
+  (
+    'bc963376-b5c4-4cf4-9705-999abd515c96', -- Chasing the Gopher
+    'dde3159b-f7bf-46e0-b096-a9ec123bec90'  -- statically-typed
+  ),
+  (
+    'ceb9082f-eb92-4cc6-b0f5-3f358ff71bd0', -- Taming the Python
+    'dde3159b-f7bf-46e0-b096-a9ec123bec90'  -- garbage-collected
+  ),
+  (
+    'fd154bb5-d112-4a54-845e-bdc57d72ab08', -- Feeling Rusty
+    '46b649c6-7e5e-4327-8a2a-610c86800f03'  -- manual-memory-management
+  )
+;
+```
+
+Now we can query these tables using regular `join`s to attach tags to posts:
+
+```sql
+select * from posts
+left join post_tags on posts.id = post_tags.post_id
+left join tags on tags.id = post_tags.tag_id
+```
+
+Which results in the following...
+
+| id                                   | name               | content | post_id                              | tag_id                               | id                                   | name                     |
+| ------------------------------------ | ------------------ | ------- | ------------------------------------ | ------------------------------------ | ------------------------------------ | ------------------------ |
+| bc963376-b5c4-4cf4-9705-999abd515c96 | Chasing the Gopher | ...     | bc963376-b5c4-4cf4-9705-999abd515c96 | a64b2f87-504d-4f3e-b989-916ffc0a507b | a64b2f87-504d-4f3e-b989-916ffc0a507b | statically-typed         |
+| fd154bb5-d112-4a54-845e-bdc57d72ab08 | Feeling Rusty      | ...     | fd154bb5-d112-4a54-845e-bdc57d72ab08 | a64b2f87-504d-4f3e-b989-916ffc0a507b | a64b2f87-504d-4f3e-b989-916ffc0a507b | statically-typed         |
+| ceb9082f-eb92-4cc6-b0f5-3f358ff71bd0 | Taming the Python  | ...     | ceb9082f-eb92-4cc6-b0f5-3f358ff71bd0 | 31fad421-385a-484c-ad78-72dc4b9afaba | 31fad421-385a-484c-ad78-72dc4b9afaba | dynamically-typed        |
+| bc963376-b5c4-4cf4-9705-999abd515c96 | Chasing the Gopher | ...     | bc963376-b5c4-4cf4-9705-999abd515c96 | dde3159b-f7bf-46e0-b096-a9ec123bec90 | dde3159b-f7bf-46e0-b096-a9ec123bec90 | garbage-collected        |
+| ceb9082f-eb92-4cc6-b0f5-3f358ff71bd0 | Taming the Python  | ...     | ceb9082f-eb92-4cc6-b0f5-3f358ff71bd0 | dde3159b-f7bf-46e0-b096-a9ec123bec90 | dde3159b-f7bf-46e0-b096-a9ec123bec90 | garbage-collected        |
+| fd154bb5-d112-4a54-845e-bdc57d72ab08 | Feeling Rusty      | ...     | fd154bb5-d112-4a54-845e-bdc57d72ab08 | 46b649c6-7e5e-4327-8a2a-610c86800f03 | 46b649c6-7e5e-4327-8a2a-610c86800f03 | manual-memory-management |
+
+
+As you can see, each post is duplicated for every associate tag.
+
+
+## Moving LATERALy
+
+Leveraging Postgres' 
+[LATERAL subqueries](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-LATERAL),
+and json aggeregation functions such as `json_agg`, we can vastly simplify the
+resulting data:
+
+```sql
+create view posts_with_tags as
+select
+  posts.*,
+  tags.tags
+from posts
+left join lateral (
+  select
+    coalesce(json_agg(tags.*), '[]'::json) as tags
+  from post_tags
+  inner join tags
+    on tags.id = post_tags.tag_id
+  where post_tags.post_id = posts.id
+) tags on true;
+```
+
+And now, when we query this view:
+
+```sql
+select * from posts_with_tags;
+```
+
+| id                                   | name               | content | tags                            |
+| ------------------------------------ | ------------------ | ------- | ------------------------------- |
+| bc963376-b5c4-4cf4-9705-999abd515c96 | Chasing the Gopher | ...     | `[{"id":"a64b2f87-504d-4f3e-b989-916ffc0a507b","name":"statically-typed"},{"id":"dde3159b-f7bf-46e0-b096-a9ec123bec90","name":"garbage-collected"}]` |
+| fd154bb5-d112-4a54-845e-bdc57d72ab08 | Feeling Rusty      | ...     | `[{"id":"a64b2f87-504d-4f3e-b989-916ffc0a507b","name":"statically-typed"},{"id":"46b649c6-7e5e-4327-8a2a-610c86800f03","name":"manual-memory-management"}]` |
+| ceb9082f-eb92-4cc6-b0f5-3f358ff71bd0 | Taming the Python  | ...     | `[{"id":"31fad421-385a-484c-ad78-72dc4b9afaba","name":"dynamically-typed"},{"id":"dde3159b-f7bf-46e0-b096-a9ec123bec90","name":"garbage-collected"}]` |
+
+And we can even spit the whole thing out as JSON:
+
+```sql
+with data as (
+	select * from posts_with_tags
+)
+select json_agg(data) from data
+```
+
+```json
+[
+  {
+    "id": "bc963376-b5c4-4cf4-9705-999abd515c96",
+    "name": "Chasing the Gopher",
+    "content": "...",
+    "tags": [
+      {
+        "id": "a64b2f87-504d-4f3e-b989-916ffc0a507b",
+        "name": "statically-typed"
+      },
+      {
+        "id": "dde3159b-f7bf-46e0-b096-a9ec123bec90",
+        "name": "garbage-collected"
+      }
+    ]
+  },
+  {
+    "id": "fd154bb5-d112-4a54-845e-bdc57d72ab08",
+    "name": "Feeling Rusty",
+    "content": "...",
+    "tags": [
+      {
+        "id": "a64b2f87-504d-4f3e-b989-916ffc0a507b",
+        "name": "statically-typed"
+      },
+      {
+        "id": "46b649c6-7e5e-4327-8a2a-610c86800f03",
+        "name": "manual-memory-management"
+      }
+    ]
+  },
+  {
+    "id": "ceb9082f-eb92-4cc6-b0f5-3f358ff71bd0",
+    "name": "Taming the Python",
+    "content": "...",
+    "tags": [
+      {
+        "id": "31fad421-385a-484c-ad78-72dc4b9afaba",
+        "name": "dynamically-typed"
+      },
+      {
+        "id": "dde3159b-f7bf-46e0-b096-a9ec123bec90",
+        "name": "garbage-collected"
+      }
+    ]
+  }
+]
+````
+
+## A note on denormalisation
+
+Another way of tackling this problem is through **data denormalisation**. 
+
+This approach involves storing related data together so that reads are simpler
+and faster due to lack of joins. For example, this might mean storing tags and 
+comments as part of a post.
+
+In Postgres you could achieve this with an array or JSON column, and heavily 
+denormalised systems generally leverage dedicated document DBs (ie. MongoDB),
+completely foregoing relational DBs.
+
+While this optimises for reads, it then becomes more costly and difficult to update,
+as you now have to update any related resources in every place it is stored.
+For example, if a tag was renamed from `k8s` to `kubernetes`, every post must
+then be updated individually to reflect this change.
+
+<Note>
+
+One high profile instance of this was Instagram - 
+[source](https://instagram-engineering.com/instagration-pt-2-scaling-our-infrastructure-to-multiple-data-centers-5745cbad7834).
+
+</Note>
+
+### 
